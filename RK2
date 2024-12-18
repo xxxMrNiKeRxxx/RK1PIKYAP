@@ -1,0 +1,193 @@
+РК2
+Герасимович Никита Иванович ИУ5-35Б
+
+Код на python: 
+
+import unittest
+
+
+class SyntaxConstruction:
+    def __init__(self, id: int, name: str):
+        self.id = id
+        self.name = name
+
+class ProgrammingLanguage:
+    def __init__(self, id: int, name: str):
+        self.id = id
+        self.name = name
+
+class ConstructionInLanguage:
+    def __init__(self, construction_id: int, language_id: int):
+        self.construction_id = construction_id
+        self.language_id = language_id
+
+
+# Test data:
+constructions = [
+    SyntaxConstruction(1, "Conditional Statement"),
+    SyntaxConstruction(2, "For Loop"),
+    SyntaxConstruction(3, "Function"),
+    SyntaxConstruction(4, "Variable"),
+]
+
+languages = [
+    ProgrammingLanguage(1, "Python"),
+    ProgrammingLanguage(2, "Java"),
+    ProgrammingLanguage(3, "C++"),
+    ProgrammingLanguage(4, "JavaScript"),
+]
+
+constructions_in_languages = [
+    ConstructionInLanguage(1, 1),
+    ConstructionInLanguage(1, 2),
+    ConstructionInLanguage(1, 3),
+    ConstructionInLanguage(1, 4),
+    ConstructionInLanguage(2, 1),
+    ConstructionInLanguage(2, 2),
+    ConstructionInLanguage(2, 3),
+    ConstructionInLanguage(3, 1),
+    ConstructionInLanguage(3, 2),
+    ConstructionInLanguage(3, 3),
+    ConstructionInLanguage(3, 4),
+    ConstructionInLanguage(4, 1),
+    ConstructionInLanguage(4, 2),
+    ConstructionInLanguage(4, 3),
+]
+
+def find_constructions_starting_with_letter(letter: str, constructions: list, languages: list, constructions_in_languages: list):
+    """
+    Outputs a list of all Syntax Constructions whose names start with a letter,
+    and a list of programming languages.
+    """
+    output = []
+    for construction in constructions:
+        if construction.name.startswith(letter):
+            output.append(f"Syntax Construction: {construction.name}")
+            languages_in_construction = [
+                languages[c.language_id - 1] for c in constructions_in_languages if c.construction_id == construction.id
+            ]
+            output.append(f"\tProgramming Languages: {', '.join([l.name for l in languages_in_construction])}")
+    return output
+
+
+def find_constructions_with_max_languages(constructions: list, languages: list, constructions_in_languages: list):
+    """
+    Outputs a list of Syntax Constructions with the maximum number of
+    Programming Languages in each construction, sorted by the maximum number.
+    """
+    constructions_with_language_count = {}
+    for c in constructions_in_languages:
+        construction_id = c.construction_id
+        if construction_id in constructions_with_language_count:
+            constructions_with_language_count[construction_id] += 1
+        else:
+            constructions_with_language_count[construction_id] = 1
+
+    # Сортируем по количеству языков, а затем по названию конструкции
+    constructions_with_language_count = sorted(constructions_with_language_count.items(),
+                                               key=lambda item: (-item[1], item[0]))
+
+    output = []
+    for construction_id, language_count in constructions_with_language_count:
+        construction = next((c for c in constructions if c.id == construction_id), None)
+        if construction:
+            output.append(f"Syntax Construction: {construction.name}, Number of Languages: {language_count}")
+    return output
+
+
+def find_related_constructions_and_languages(constructions: list, languages: list, constructions_in_languages: list):
+    """
+    Outputs a list of all related syntax constructions and programming languages,
+    sorted by syntax constructions, with arbitrary sorting for programming languages.
+    """
+    output = []
+    for construction in constructions:
+        output.append(f"Syntax Construction: {construction.name}")
+        related_languages = [
+            languages[c.language_id - 1] for c in constructions_in_languages if c.construction_id == construction.id
+        ]
+        for language in related_languages:
+            output.append(f"\tProgramming Language: {language.name}")
+    return output
+
+
+
+class TestSyntaxAndLanguageFunctions(unittest.TestCase):
+
+    def setUp(self):
+        self.constructions = [
+            SyntaxConstruction(1, "Conditional Statement"),
+            SyntaxConstruction(2, "For Loop"),
+            SyntaxConstruction(3, "Function"),
+            SyntaxConstruction(4, "Variable"),
+        ]
+
+        self.languages = [
+            ProgrammingLanguage(1, "Python"),
+            ProgrammingLanguage(2, "Java"),
+            ProgrammingLanguage(3, "C++"),
+            ProgrammingLanguage(4, "JavaScript"),
+        ]
+
+        self.constructions_in_languages = [
+            ConstructionInLanguage(1, 1),
+            ConstructionInLanguage(1, 2),
+            ConstructionInLanguage(1, 3),
+            ConstructionInLanguage(1, 4),
+            ConstructionInLanguage(2, 1),
+            ConstructionInLanguage(2, 2),
+            ConstructionInLanguage(2, 3),
+            ConstructionInLanguage(3, 1),
+            ConstructionInLanguage(3, 2),
+            ConstructionInLanguage(3, 3),
+            ConstructionInLanguage(3, 4),
+            ConstructionInLanguage(4, 1),
+            ConstructionInLanguage(4, 2),
+            ConstructionInLanguage(4, 3),
+        ]
+
+    def test_find_constructions_starting_with_letter(self):
+        expected_output = [
+            "Syntax Construction: Conditional Statement",
+            "\tProgramming Languages: Python, Java, C++, JavaScript"
+        ]
+        output = find_constructions_starting_with_letter('C', self.constructions, self.languages, self.constructions_in_languages)
+        self.assertEqual(output, expected_output)
+
+    def test_find_constructions_with_max_languages(self):
+        expected_output = [
+            "Syntax Construction: Function, Number of Languages: 4",
+            "Syntax Construction: Conditional Statement, Number of Languages: 4",
+            "Syntax Construction: For Loop, Number of Languages: 3",
+            "Syntax Construction: Variable, Number of Languages: 3"
+        ]
+        output = find_constructions_with_max_languages(self.constructions, self.languages,
+                                                       self.constructions_in_languages)
+        self.assertCountEqual(output, expected_output)
+
+    def test_find_related_constructions_and_languages(self):
+        expected_output = [
+            "Syntax Construction: Conditional Statement",
+            "\tProgramming Language: Python",
+            "\tProgramming Language: Java",
+            "\tProgramming Language: C++",
+            "\tProgramming Language: JavaScript",
+            "Syntax Construction: For Loop",
+            "\tProgramming Language: Python",
+            "\tProgramming Language: Java",
+            "\tProgramming Language: C++",
+            "Syntax Construction: Function",
+            "\tProgramming Language: Python",
+            "\tProgramming Language: Java",
+            "\tProgramming Language: C++",
+            "\tProgramming Language: JavaScript",
+            "Syntax Construction: Variable",
+            "\tProgramming Language: Python",
+            "\tProgramming Language: Java",
+            "\tProgramming Language: C++",
+        ]
+        output = find_related_constructions_and_languages(self.constructions, self.languages, self.constructions_in_languages)
+        self.assertEqual(output, expected_output)
+
+if __name__ == '__main__':
+    unittest.main()
